@@ -1,41 +1,47 @@
 package fr.gregdev.capitalesgame;
 
 import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+
 public class Quizz {
-	private int score;
 
-	public void quizzCapitales(int numberQuestions) {
-		Scanner clavier = new Scanner(System.in);
-		QuizzCapitale quizzCapitale = new QuizzCapitale(numberQuestions);
-		ArrayList<String> listQuizz = quizzCapitale.getRandomTabCountryCapitales();
-		for (int i = 0; i < numberQuestions; i++) {
+    protected static final String MESSAGE_REPLAY = "Voulez vous rejouez ? O/N ";
+    protected static final String MESSAGE_SCORE = "Votre score est de %s/%s\n";
+    protected static final String MESSAGE_QUESTION = "Quelle est la capitale de ce pays: %s";
+    protected static final String MESSAGE_CHOICE_GAME = "Choisissez un jeu dans la liste suivante: ";
+    protected static final String MESSAGE_CHOICE_NUMBER_QUESTION = "Choisissez le nombre de questions pour le quizz.";
+    protected static final String MESSAGE_ERROR_NUMBER_QUESTION = "Le nombre de question ne peut dépasser ";
+    protected static final String MESSAGE_ERROR_GAME = "Désolé ce jeu n'existe pas";
+    protected static final String MESSAGE_FINAL = "À bientôt";
 
-			String[] tabQuestionReponse = listQuizz.get(i).split(":");
-			System.out.printf("Quelle est la capitale du pays suivant: %s\n", tabQuestionReponse[0]);
-			String response = sansAccent(clavier.nextLine().trim());
-			System.out.println();
-			if (response.equalsIgnoreCase(sansAccent(tabQuestionReponse[1]))) {
-				this.score++;
-			}
+    public static final String GAME_LIST = "(capitale - math)";
 
-		}
-		System.out.printf("Votre score es de %s/%s", score, numberQuestions);
-		clavier.close();
+    public void launch() {
+	Quizz.launchGame(Quizz.selectGame());
+    }
+
+    private static void launchGame(String game) {
+	switch (game) {
+	case "capitale":
+	    new QuizzCapitale();
+	    break;
+
+	default:
+	    JOptionPane.showMessageDialog(null, MESSAGE_ERROR_GAME);
+	    break;
 	}
+    }
 
-	public int getScore() {
-		return score;
-	}
+    private static String selectGame() {
+	return JOptionPane.showInputDialog(MESSAGE_CHOICE_GAME + GAME_LIST);
+    }
 
-	public static String sansAccent(String s) {
-
-		String strTemp = Normalizer.normalize(s, Normalizer.Form.NFD);
-		Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-		return pattern.matcher(strTemp).replaceAll("");
-	}
+    public static String withoutAccent(String s) {
+	String strTemp = Normalizer.normalize(s, Normalizer.Form.NFD);
+	Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+	return pattern.matcher(strTemp).replaceAll("");
+    }
 
 }

@@ -3,46 +3,87 @@ package fr.gregdev.capitalesgame;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class QuizzCapitale {
+import javax.swing.JOptionPane;
 
-	private ArrayList<String> countriesCapitalesList;
-	private int numberQuestions;
+public class QuizzCapitale extends Quizz implements QuizzInterface {
 
-	public QuizzCapitale(int numberQuestions) {
-		this.countriesCapitalesList = createTabCountryCapitales();
-		if (numberQuestions <= this.countriesCapitalesList.size()) {
-			this.numberQuestions = numberQuestions;
-		} else {
-			throw new IllegalArgumentException(
-					"Le nombre de question ne peut dépasser " + this.countriesCapitalesList.size());
-		}
+    private final ArrayList<String> COUNTRIES_CAPITALES_LIST = this.getListQuizz();
+    private final int COUNTRIES_CAPITALES_LIST_SIZE = COUNTRIES_CAPITALES_LIST.size();
+    private int numberQuestions;
+    private int score;
+
+    public QuizzCapitale() {
+	this.numberQuestions = this.selectNumberQuestion();
+	this.launch();
+    }
+
+    @Override
+    public void launch() {
+	if (this.numberQuestions <= COUNTRIES_CAPITALES_LIST_SIZE) {
+	    game(this.numberQuestions);
+	    replay();
+	} else {
+	    JOptionPane.showMessageDialog(null, Quizz.MESSAGE_ERROR_NUMBER_QUESTION + COUNTRIES_CAPITALES_LIST_SIZE);
+	    new QuizzCapitale();
 	}
+    }
 
-	private static ArrayList<String> createTabCountryCapitales() {
+    @Override
+    public void game(int numberQuestions) {
 
-		ArrayList<String> tab = new ArrayList<String>();
-		tab.addAll(Arrays.asList("France:Paris", "Espagne:Madrid", "Portugal:Lisbonne", "Allemagne:Berlin",
-				"Grèce:Athènes", "Italie:Rome"));
-		return tab;
+	// random table of questions and response
+	ArrayList<String> listQuizz = this.getRandomTab();
+
+	for (int i = 0; i < numberQuestions; i++) {
+	    String[] tabQuestionReponse = listQuizz.get(i).split(":");
+	    String response = Quizz.withoutAccent(
+		    JOptionPane.showInputDialog(String.format(Quizz.MESSAGE_QUESTION, tabQuestionReponse[0])).trim());
+	    if (response.equalsIgnoreCase(Quizz.withoutAccent(tabQuestionReponse[1]))) {
+		this.score++;
+	    }
 	}
+	JOptionPane.showMessageDialog(null, String.format(Quizz.MESSAGE_SCORE, score, numberQuestions));
+    }
 
-	public ArrayList<String> getRandomTabCountryCapitales() {
+    @Override
+    public void replay() {
 
-		ArrayList<String> tabRandom = new ArrayList<String>();
-		ArrayList<String> tabList = this.countriesCapitalesList;
+	String replay = JOptionPane.showInputDialog(null, Quizz.MESSAGE_REPLAY);
+	if (replay.equalsIgnoreCase("O")) {
+	    new QuizzCapitale();
+	} else {
+	    JOptionPane.showMessageDialog(null, Quizz.MESSAGE_FINAL);
 
-		for (int i = 0; i < this.numberQuestions; i++) {
-			int random = (int) (Math.random() * (tabList.size() - 1));
-			tabRandom.add(tabList.get(random));
-			tabList.remove(tabList.get(random));
-
-		}
-
-		return tabRandom;
 	}
+    }
 
-	public ArrayList<String> getCountriesCapitalesList() {
-		return countriesCapitalesList;
+    @Override
+    public int selectNumberQuestion() {
+	return Integer.parseInt(JOptionPane.showInputDialog(MESSAGE_CHOICE_NUMBER_QUESTION));
+    }
+
+    @Override
+    public ArrayList<String> getListQuizz() {
+	// TODO récupération de la liste à partir d'un fichier
+	ArrayList<String> tab = new ArrayList<String>();
+	tab.addAll(Arrays.asList("France:Paris", "Espagne:Madrid", "Portugal:Lisbonne", "Allemagne:Berlin",
+		"Grèce:Athènes", "Italie:Rome", "Angleterre:Londres", "Algérie:Alger", "Japon:Tokyo",
+		"Corée du sud:Séoul"));
+	return tab;
+    }
+
+    @Override
+    public ArrayList<String> getRandomTab() {
+
+	ArrayList<String> tabRandom = new ArrayList<String>();
+	ArrayList<String> tabList = COUNTRIES_CAPITALES_LIST;
+
+	for (int i = 0; i < this.numberQuestions; i++) {
+	    int random = (int) (Math.random() * (tabList.size() - 1));
+	    tabRandom.add(tabList.get(random));
+	    tabList.remove(tabList.get(random));
 	}
+	return tabRandom;
+    }
 
 }
