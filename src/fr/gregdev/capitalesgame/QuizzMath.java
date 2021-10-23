@@ -5,35 +5,34 @@ import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 
-public class QuizzCapitale extends Quizz implements QuizzInterface {
+public class QuizzMath extends Quizz implements QuizzInterface {
 
-    private final String MESSAGE_QUESTION = "Quelle est la capitale de ce pays: %s";
-    private final ArrayList<String> COUNTRIES_CAPITALES_LIST = this.getListQuizz();
-    private final int COUNTRIES_CAPITALES_LIST_SIZE = COUNTRIES_CAPITALES_LIST.size();
+    private final String MESSAGE_QUESTION = "Quelle est le résultat de cette opération: %s";
+    private final ArrayList<String> MATH_LIST = this.getListQuizz();
+    private final int MATH_LIST_SIZE = MATH_LIST.size();
     private int numberQuestions;
     private int score;
 
-    public QuizzCapitale() {
+    public QuizzMath() {
 	this.numberQuestions = Quizz.selectNumberQuestion();
 	this.launch();
     }
 
     @Override
     public void launch() {
-	if (this.numberQuestions <= COUNTRIES_CAPITALES_LIST_SIZE) {
+	if (this.numberQuestions <= MATH_LIST_SIZE) {
 	    game(this.numberQuestions);
 	    Quizz.replay();
 	} else {
-	    JOptionPane.showMessageDialog(null, Quizz.MESSAGE_ERROR_NUMBER_QUESTION + COUNTRIES_CAPITALES_LIST_SIZE);
-	    new QuizzCapitale();
+	    JOptionPane.showMessageDialog(null, Quizz.MESSAGE_ERROR_NUMBER_QUESTION + MATH_LIST_SIZE);
+	    new QuizzMath();
 	}
     }
 
     @Override
     public void game(int numberQuestions) {
-
 	// random table of questions and response
-	ArrayList<String> listQuizz = Quizz.getRandomTab(COUNTRIES_CAPITALES_LIST, numberQuestions);
+	ArrayList<String> listQuizz = Quizz.getRandomTab(MATH_LIST, numberQuestions);
 
 	for (int i = 0; i < numberQuestions; i++) {
 	    String[] tabQuestionReponse = listQuizz.get(i).split(":");
@@ -44,15 +43,16 @@ public class QuizzCapitale extends Quizz implements QuizzInterface {
 	    }
 	}
 	JOptionPane.showMessageDialog(null, String.format(Quizz.MESSAGE_SCORE, score, numberQuestions));
+
     }
 
     @Override
     public ArrayList<String> getListQuizz() {
 	// TODO récupération de la liste à partir d'un fichier
+	// TODO Mettre la methode dans la classe mere
 	ArrayList<String> tab = new ArrayList<String>();
-	tab.addAll(Arrays.asList("France:Paris", "Espagne:Madrid", "Portugal:Lisbonne", "Allemagne:Berlin",
-		"Grèce:Athènes", "Italie:Rome", "Angleterre:Londres", "Algérie:Alger", "Japon:Tokyo",
-		"Corée du sud:Séoul"));
+	tab.addAll(Arrays.asList("1+1:2", "3*4:12", "8+8:16", "8*8:64", "25+25:50", "14-8:6", "12-2:10", "20*10:200",
+		"35+35:70", "12/6:2"));
 	return tab;
     }
 

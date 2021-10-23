@@ -8,12 +8,6 @@ public interface QuizzInterface {
 
     public void game(int numberQuestions);
 
-    public void replay();
-
-    public int selectNumberQuestion();
-
-    public ArrayList<String> getRandomTab();
-
     public ArrayList<String> getListQuizz();
 
 }
