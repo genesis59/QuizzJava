@@ -43,12 +43,12 @@ public class Quizz {
     }
 
     public static void replay() {
-	String replay = JOptionPane.showInputDialog(null, Quizz.MESSAGE_REPLAY);
-	if (replay.equalsIgnoreCase("O")) {
+	char replay = JOptionPane.showInputDialog(null, Quizz.MESSAGE_REPLAY).toLowerCase().charAt(0);
+	if (replay == 'o') {
 	    new QuizzMath();
-	} else if (replay.equalsIgnoreCase("C")) {
+	} else if (replay == 'c') {
 	    new Quizz().launch();
-	} else if (replay.equalsIgnoreCase("N")) {
+	} else if (replay == 'n') {
 	    JOptionPane.showMessageDialog(null, Quizz.MESSAGE_FINAL);
 	} else {
 	    Quizz.replay();
