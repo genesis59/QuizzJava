@@ -34,7 +34,7 @@ public class QuizzCapitale extends Quizz implements QuizzInterface {
 
 	// random table of questions and response
 	ArrayList<String> listQuizz = Quizz.getRandomTab(COUNTRIES_CAPITALES_LIST, numberQuestions);
-
+	long startTime = System.currentTimeMillis();
 	for (int i = 0; i < numberQuestions; i++) {
 	    String[] tabQuestionReponse = listQuizz.get(i).split(":");
 	    String response = Quizz.withoutAccent(
@@ -43,7 +43,9 @@ public class QuizzCapitale extends Quizz implements QuizzInterface {
 		this.score++;
 	    }
 	}
-	JOptionPane.showMessageDialog(null, String.format(Quizz.MESSAGE_SCORE, score, numberQuestions));
+	long endTime = System.currentTimeMillis();
+	JOptionPane.showMessageDialog(null,
+		String.format(Quizz.MESSAGE_SCORE, score, numberQuestions, (endTime - startTime) / 1000));
     }
 
     @Override

@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 public class Quizz {
 
     protected static final String MESSAGE_REPLAY = "Voulez vous rejouez ? O/N\n Changer de quizz ? C";
-    protected static final String MESSAGE_SCORE = "Votre score est de %s/%s\n";
+    protected static final String MESSAGE_SCORE = "Votre score est de %s/%s\nVotre temps de réponse est de %d s";
     protected static final String MESSAGE_CHOICE_GAME = "Choisissez un jeu dans la liste suivante: ";
     protected static final String MESSAGE_CHOICE_NUMBER_QUESTION = "Choisissez le nombre de questions pour le quizz.";
     protected static final String MESSAGE_ERROR_NUMBER_QUESTION = "Le nombre de questions ne peut dépasser ";
@@ -33,6 +33,7 @@ public class Quizz {
 
 	default:
 	    JOptionPane.showMessageDialog(null, MESSAGE_ERROR_GAME);
+	    Quizz.launchGame(Quizz.selectGame());
 	    break;
 	}
     }
