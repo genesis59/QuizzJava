@@ -1,81 +1,139 @@
+/**
+ * Gère le déroulement des quizz en fonction d'un mode d'affichage défini
+ * Quizz mère
+ * 
+ * Fait par GregDev le 25/10/2121
+ */
+
 package fr.gregdev.capitalesgame;
 
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
+import fr.gregdev.capitalesgame.generators.CapitaleGenerator;
+import fr.gregdev.capitalesgame.generators.MathGenerator;
 
-import javax.swing.JOptionPane;
+public abstract class Quizz {
 
-public class Quizz {
+    // TODO variable à transformer
+    public static final String GAME_LIST = "(capitale - math)";
+    private String game;
+    private int numberQuestions;
+    private Quizz myQuizz;
+    private int maxSizeQuizz;
 
     protected static final String MESSAGE_REPLAY = "Voulez vous rejouez ? O/N\n Changer de quizz ? C";
-    protected static final String MESSAGE_SCORE = "Votre score est de %s/%s\nVotre temps de réponse est de %d s";
     protected static final String MESSAGE_CHOICE_GAME = "Choisissez un jeu dans la liste suivante: ";
     protected static final String MESSAGE_CHOICE_NUMBER_QUESTION = "Choisissez le nombre de questions pour le quizz.";
+    protected static final String MESSAGE_ERROR_CHOICE_NUMBER_QUESTION = "le nombre de questions doit être un entier.";
     protected static final String MESSAGE_ERROR_NUMBER_QUESTION = "Le nombre de questions ne peut dépasser ";
     protected static final String MESSAGE_ERROR_GAME = "Désolé ce jeu n'existe pas";
     protected static final String MESSAGE_FINAL = "À bientôt";
 
-    public static final String GAME_LIST = "(capitale - math)";
-
-    public void launch() {
-	Quizz.launchGame(Quizz.selectGame());
+    /**
+     * constructeur
+     */
+    public Quizz() {
+	this.myQuizz = this;
+	this.game = this.selectGame();
+	this.numberQuestions = this.selectNumberQuestion();
+	this.launchGame(game);
     }
 
-    private static void launchGame(String game) {
+    /**
+     * affiche en mode console ou fenêtre
+     */
+    public abstract void displayMessage(String message);
+
+    /**
+     * affiche en mode console ou fenêtre et récupère un réponse utilisateur
+     */
+    public abstract String retrieveAnswer(String Message);
+
+    /**
+     * Choix du quizz
+     * 
+     * @return
+     */
+    private String selectGame() {
+	String response = this.retrieveAnswer(MESSAGE_CHOICE_GAME + GAME_LIST);
+	if (response.equalsIgnoreCase("capitale")) {
+	    this.maxSizeQuizz = CapitaleGenerator.MAX_SIZE;
+	    return response;
+	} else if (response.equalsIgnoreCase("math")) {
+	    this.maxSizeQuizz = MathGenerator.MAX_SIZE;
+	    return response;
+	} else {
+	    displayMessage(MESSAGE_ERROR_GAME);
+	    return this.selectGame();
+	}
+    }
+
+    /**
+     * Choix du nombre de questions
+     * 
+     * @return
+     */
+    private int selectNumberQuestion() {
+	try {
+	    int userChoice = Integer.parseInt(this.retrieveAnswer(MESSAGE_CHOICE_NUMBER_QUESTION));
+	    if (userChoice <= this.maxSizeQuizz) {
+		return userChoice;
+	    } else {
+		displayMessage(MESSAGE_ERROR_NUMBER_QUESTION + this.maxSizeQuizz);
+		return this.selectNumberQuestion();
+	    }
+	} catch (Exception e) {
+	    displayMessage(MESSAGE_ERROR_CHOICE_NUMBER_QUESTION);
+	    return this.selectNumberQuestion();
+	}
+
+    }
+
+    /**
+     * Lance l'instance du quizz demandé TODO Méthode à modifier
+     * 
+     * @param game
+     */
+    private void launchGame(String game) {
+
 	switch (game) {
 	case "capitale":
-	    new QuizzCapitale();
+	    new CapitaleGenerator(this.myQuizz, this.numberQuestions);
 	    break;
 	case "math":
-	    new QuizzMath();
-	    break;
-
-	default:
-	    JOptionPane.showMessageDialog(null, MESSAGE_ERROR_GAME);
-	    Quizz.launchGame(Quizz.selectGame());
+	    new MathGenerator(this.myQuizz, this.numberQuestions);
 	    break;
 	}
+	this.replay();
     }
 
-    private static String selectGame() {
-	return JOptionPane.showInputDialog(MESSAGE_CHOICE_GAME + GAME_LIST);
-    }
+    /**
+     * Demande si oui ou non le joueur veut continuer ou si il veut changer de quizz
+     * TODO Méthode à modifier
+     */
+    private void replay() {
 
-    public static void replay() {
-	char replay = JOptionPane.showInputDialog(null, Quizz.MESSAGE_REPLAY).toLowerCase().charAt(0);
+	char replay = this.retrieveAnswer(MESSAGE_REPLAY).toLowerCase().charAt(0);
 	if (replay == 'o') {
-	    new QuizzMath();
+	    if (game.equals("math")) {
+		new MathGenerator(myQuizz, this.numberQuestions);
+	    } else if (game.equals("capitale")) {
+		new CapitaleGenerator(myQuizz, this.numberQuestions);
+	    }
+	    replay();
 	} else if (replay == 'c') {
-	    new Quizz().launch();
+	    myQuizz.WhatAmI();
 	} else if (replay == 'n') {
-	    JOptionPane.showMessageDialog(null, Quizz.MESSAGE_FINAL);
+	    displayMessage(MESSAGE_FINAL);
 	} else {
-	    Quizz.replay();
+	    this.replay();
 	}
     }
 
-    public static ArrayList<String> getRandomTab(ArrayList<String> arrayList, int numberQuestions) {
-
-	ArrayList<String> tabRandom = new ArrayList<String>();
-	ArrayList<String> tabList = arrayList;
-
-	for (int i = 0; i < numberQuestions; i++) {
-	    int random = (int) (Math.random() * (tabList.size() - 1));
-	    tabRandom.add(tabList.get(random));
-	    tabList.remove(tabList.get(random));
+    public Quizz WhatAmI() {
+	if (this instanceof GUIQuizz) {
+	    return new GUIQuizz();
+	} else {
+	    return new ConsoleQuizz();
 	}
-	return tabRandom;
-    }
-
-    public static int selectNumberQuestion() {
-	return Integer.parseInt(JOptionPane.showInputDialog(MESSAGE_CHOICE_NUMBER_QUESTION));
-    }
-
-    public static String withoutAccent(String s) {
-	String strTemp = Normalizer.normalize(s, Normalizer.Form.NFD);
-	Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-	return pattern.matcher(strTemp).replaceAll("");
     }
 
 }
